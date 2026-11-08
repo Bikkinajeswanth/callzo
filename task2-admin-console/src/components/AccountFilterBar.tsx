@@ -6,6 +6,7 @@ interface AccountFilterBarProps {
   onChange: (updated: Partial<AccountFilterParams>) => void;
   onReset: () => void;
   selectedCount: number;
+  onClearSelection?: () => void;
 }
 
 export const AccountFilterBar: React.FC<AccountFilterBarProps> = ({
@@ -13,6 +14,7 @@ export const AccountFilterBar: React.FC<AccountFilterBarProps> = ({
   onChange,
   onReset,
   selectedCount,
+  onClearSelection,
 }) => {
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm mb-4 space-y-3">
@@ -86,14 +88,24 @@ export const AccountFilterBar: React.FC<AccountFilterBarProps> = ({
           <input
             type="date"
             value={params.start_date ? params.start_date.substring(0, 10) : ''}
-            onChange={(e) => onChange({ start_date: e.target.value ? new Date(e.target.value).toISOString() : '', page: 1 })}
+            onChange={(e) =>
+              onChange({
+                start_date: e.target.value ? `${e.target.value}T00:00:00Z` : '',
+                page: 1,
+              })
+            }
             className="px-2 py-1 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-sky-500"
           />
           <span>to</span>
           <input
             type="date"
             value={params.end_date ? params.end_date.substring(0, 10) : ''}
-            onChange={(e) => onChange({ end_date: e.target.value ? new Date(e.target.value).toISOString() : '', page: 1 })}
+            onChange={(e) =>
+              onChange({
+                end_date: e.target.value ? `${e.target.value}T23:59:59Z` : '',
+                page: 1,
+              })
+            }
             className="px-2 py-1 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-sky-500"
           />
           {(params.search || params.status || params.plan || params.country || params.start_date || params.end_date) && (
@@ -109,7 +121,19 @@ export const AccountFilterBar: React.FC<AccountFilterBarProps> = ({
         {/* Stable Selection Summary */}
         {selectedCount > 0 && (
           <div className="flex items-center space-x-2 text-xs bg-sky-50 dark:bg-sky-950/70 border border-sky-200 dark:border-sky-900 px-3 py-1 rounded-lg text-sky-800 dark:text-sky-300">
-            <span className="font-semibold">{selectedCount}</span> account{selectedCount > 1 ? 's' : ''} selected across pages
+            <span>
+              <span className="font-semibold">{selectedCount}</span> account{selectedCount > 1 ? 's' : ''} selected across pages
+            </span>
+            {onClearSelection && (
+              <button
+                type="button"
+                onClick={onClearSelection}
+                className="ml-1 px-1.5 py-0.5 rounded text-[11px] font-medium text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900 transition underline underline-offset-2"
+                title="Deselect all accounts"
+              >
+                Clear
+              </button>
+            )}
           </div>
         )}
       </div>

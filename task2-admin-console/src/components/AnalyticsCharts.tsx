@@ -157,9 +157,12 @@ export const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
                   backgroundColor: '#0f172a',
                   color: '#fff',
                   borderRadius: '8px',
-                  border: 'none',
+                  border: '1px solid #334155',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                   fontSize: '12px',
                 }}
+                labelStyle={{ color: '#94a3b8', fontWeight: 600, marginBottom: '4px' }}
+                itemStyle={{ color: '#f8fafc' }}
               />
               <Area
                 type="monotone"
@@ -181,9 +184,12 @@ export const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
                   backgroundColor: '#0f172a',
                   color: '#fff',
                   borderRadius: '8px',
-                  border: 'none',
+                  border: '1px solid #334155',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                   fontSize: '12px',
                 }}
+                labelStyle={{ color: '#94a3b8', fontWeight: 600, marginBottom: '4px' }}
+                itemStyle={{ color: '#f8fafc' }}
               />
               <Bar dataKey="signups" fill="#10b981" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -212,9 +218,12 @@ export const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({
                   backgroundColor: '#0f172a',
                   color: '#fff',
                   borderRadius: '8px',
-                  border: 'none',
+                  border: '1px solid #334155',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                   fontSize: '12px',
                 }}
+                labelStyle={{ color: '#94a3b8', fontWeight: 600, marginBottom: '4px' }}
+                itemStyle={{ color: '#f8fafc' }}
               />
               <Area
                 type="monotone"

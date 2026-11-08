@@ -10,6 +10,7 @@ interface AccountTableProps {
   params: AccountFilterParams;
   onParamChange: (updated: Partial<AccountFilterParams>) => void;
   selectedIds: Set<string>;
+  selectedAccounts?: Account[];
   onToggleSelectAll: () => void;
   onToggleSelectOne: (id: string) => void;
   onOpenSettings: (accountId: string) => void;
@@ -24,6 +25,7 @@ export const AccountTable: React.FC<AccountTableProps> = ({
   params,
   onParamChange,
   selectedIds,
+  selectedAccounts = [],
   onToggleSelectAll,
   onToggleSelectOne,
   onOpenSettings,
@@ -98,22 +100,35 @@ export const AccountTable: React.FC<AccountTableProps> = ({
           {selectedIds.size > 0 && (
             <button
               onClick={() => {
-                const selectedAccounts = accounts.filter(a => selectedIds.has(a.id));
-                const csvContent = "data:text/csv;charset=utf-8," 
-                  + ["ID,Name,Email,Company,Country,Plan,Status,Minutes,Cost"]
-                  .concat(selectedAccounts.map(a => `${a.id},"${a.name}","${a.email}","${a.company}",${a.country},${a.plan},${a.status},${a.monthly_minutes},${a.cost_cents/100}`))
-                  .join("\n");
+                // Use selectedAccounts cache if populated, otherwise fall back to matching on current page
+                const exportList = selectedAccounts.length > 0
+                  ? selectedAccounts
+                  : accounts.filter((a) => selectedIds.has(a.id));
+
+                const headers = 'ID,Name,Email,Company,Country,Plan,Status,Minutes,SMS,Cost_USD';
+                const rows = exportList.map(
+                  (a) =>
+                    `${a.id},"${a.name}","${a.email}","${a.company || ''}",${a.country},${a.plan},${a.status},${a.monthly_minutes},${a.monthly_sms},${(a.cost_cents / 100).toFixed(2)}`
+                );
+                const csvContent = 'data:text/csv;charset=utf-8,' + [headers, ...rows].join('\n');
                 const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", `callzo_selected_tenants_${new Date().toISOString().substring(0,10)}.csv`);
+                const link = document.createElement('a');
+                link.setAttribute('href', encodedUri);
+                link.setAttribute(
+                  'download',
+                  `callzo_selected_tenants_${new Date().toISOString().substring(0, 10)}.csv`
+                );
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
               }}
               className="px-2.5 py-1 text-xs font-semibold rounded bg-sky-600 hover:bg-sky-700 text-white shadow-sm transition flex items-center space-x-1"
+              title={`Export ${selectedIds.size} selected account(s) to CSV`}
             >
-              <span>Export CSV</span>
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span>Export CSV ({selectedIds.size})</span>
             </button>
           )}
 

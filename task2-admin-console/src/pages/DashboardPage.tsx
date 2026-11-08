@@ -15,7 +15,7 @@ interface DashboardPageProps {
   onRefreshAll: () => void;
 }
 
-export const DashboardPage: React.FC<DashboardPageProps> = ({}) => {
+export const DashboardPage: React.FC<DashboardPageProps> = ({ isRefreshing, onRefreshAll: _onRefreshAll }) => {
   // Account list state
   const {
     accounts,
@@ -25,8 +25,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({}) => {
     params,
     setParams,
     selectedIds,
+    getSelectedAccounts,
     toggleSelectAllCurrentPage,
     toggleSelectAccount,
+    clearSelection,
     refresh: refreshAccounts,
   } = useAccounts();
 
@@ -38,6 +40,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({}) => {
     error: summaryError,
     reload: reloadSummary,
   } = useSummary(params.start_date, params.end_date);
+
+  // Hook up manual refresh from Header
+  React.useEffect(() => {
+    if (isRefreshing) {
+      refreshAccounts();
+      reloadSummary();
+    }
+  }, [isRefreshing, refreshAccounts, reloadSummary]);
 
   // Settings Wizard Modal state
   const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
@@ -153,6 +163,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({}) => {
           onChange={handleFilterChange}
           onReset={handleResetFilters}
           selectedCount={selectedIds.size}
+          onClearSelection={clearSelection}
         />
 
         <AccountTable
@@ -163,6 +174,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({}) => {
           params={params}
           onParamChange={handleFilterChange}
           selectedIds={selectedIds}
+          selectedAccounts={getSelectedAccounts()}
           onToggleSelectAll={toggleSelectAllCurrentPage}
           onToggleSelectOne={toggleSelectAccount}
           onOpenSettings={(id) => setEditingAccountId(id)}

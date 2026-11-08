@@ -3,7 +3,7 @@
  * Tests all 16 items required by the user against the live mock API and component logic.
  */
 
-const API_BASE = 'http://127.0.0.1:8001';
+const API_BASE = 'http://127.0.0.1:8002';
 
 async function runTests() {
   console.log('======================================================================');
@@ -28,8 +28,8 @@ async function runTests() {
   // -------------------------------------------------------------------------
   console.log('[Test 1] Verify Dashboard Metrics from Mock API');
   let summary = null;
-  // Account for deliberate 20% 500 errors by attempting up to 5 times
-  for (let i = 0; i < 5; i++) {
+  // Account for deliberate 20% 500 errors by attempting with backoff
+  for (let i = 0; i < 10; i++) {
     try {
       const res = await fetch(`${API_BASE}/accounts/summary`);
       if (res.ok) {
@@ -37,6 +37,7 @@ async function runTests() {
         break;
       }
     } catch (e) {}
+    await new Promise((r) => setTimeout(r, 80));
   }
   assert(summary !== null, 'Successfully fetched summary metrics from mock API');
   assert(typeof summary.total_accounts === 'number' && summary.total_accounts === 45, `Total accounts equals 45 (got ${summary?.total_accounts})`);

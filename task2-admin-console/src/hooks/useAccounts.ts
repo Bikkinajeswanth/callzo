@@ -27,6 +27,18 @@ export function useAccounts(initialParams?: Partial<AccountFilterParams>) {
   // Stable row selection keyed by account.id
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
+  // Cache of selected account objects so multi-page selections retain metadata for CSV export
+  const selectedAccountsCache = useRef<Map<string, Account>>(new Map());
+
+  // Keep cache populated with loaded accounts
+  useEffect(() => {
+    accounts.forEach((acc) => {
+      if (selectedIds.has(acc.id)) {
+        selectedAccountsCache.current.set(acc.id, acc);
+      }
+    });
+  }, [accounts, selectedIds]);
+
   // Ref to track in-flight requests and prevent race conditions
   const activeRequestId = useRef(0);
 
@@ -82,12 +94,19 @@ export function useAccounts(initialParams?: Partial<AccountFilterParams>) {
   const toggleSelectAllCurrentPage = () => {
     const newSelected = new Set(selectedIds);
     const currentPageIds = accounts.map((a) => a.id);
-    const allSelected = currentPageIds.every((id) => newSelected.has(id));
+    const allSelected = currentPageIds.length > 0 && currentPageIds.every((id) => newSelected.has(id));
 
     if (allSelected) {
-      currentPageIds.forEach((id) => newSelected.delete(id));
+      currentPageIds.forEach((id) => {
+        newSelected.delete(id);
+        selectedAccountsCache.current.delete(id);
+      });
     } else {
-      currentPageIds.forEach((id) => newSelected.add(id));
+      currentPageIds.forEach((id) => {
+        newSelected.add(id);
+        const acc = accounts.find((a) => a.id === id);
+        if (acc) selectedAccountsCache.current.set(id, acc);
+      });
     }
     setSelectedIds(newSelected);
   };
@@ -96,14 +115,22 @@ export function useAccounts(initialParams?: Partial<AccountFilterParams>) {
     const newSelected = new Set(selectedIds);
     if (newSelected.has(id)) {
       newSelected.delete(id);
+      selectedAccountsCache.current.delete(id);
     } else {
       newSelected.add(id);
+      const acc = accounts.find((a) => a.id === id);
+      if (acc) selectedAccountsCache.current.set(id, acc);
     }
     setSelectedIds(newSelected);
   };
 
   const clearSelection = () => {
+    selectedAccountsCache.current.clear();
     setSelectedIds(new Set());
+  };
+
+  const getSelectedAccounts = (): Account[] => {
+    return Array.from(selectedAccountsCache.current.values());
   };
 
   return {
@@ -116,6 +143,7 @@ export function useAccounts(initialParams?: Partial<AccountFilterParams>) {
     params,
     setParams,
     selectedIds,
+    getSelectedAccounts,
     toggleSelectAllCurrentPage,
     toggleSelectAccount,
     clearSelection,

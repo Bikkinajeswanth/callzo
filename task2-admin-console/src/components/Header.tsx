@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Mock API connectivity badge */}
           <div className="hidden md:flex items-center space-x-1.5 px-2.5 py-1 text-[11px] font-medium rounded-full bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-300">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>API: Port 8001</span>
+            <span>API: Connected</span>
           </div>
 
           {/* Refresh button */}

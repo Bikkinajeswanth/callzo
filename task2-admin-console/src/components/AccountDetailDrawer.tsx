@@ -10,9 +10,9 @@ interface AccountDetailDrawerProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  active: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
-  trial: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
-  suspended: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
+  active: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+  trial: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+  suspended: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300',
 };
 
 const PLAN_COLORS: Record<string, string> = {

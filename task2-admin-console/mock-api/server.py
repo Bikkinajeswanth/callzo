@@ -349,4 +349,5 @@ def submit_account_settings(account_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="0.0.0.0", port=8001, reload=True)
+    port = int(os.environ.get("PORT", 8002))
+    uvicorn.run("server:app", host="0.0.0.0", port=port, reload=True)

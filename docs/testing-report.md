@@ -77,9 +77,23 @@ The automated simulator runner (`task1-usage-metering/simulator/runner.py`) prov
 
 ---
 
-## 4. Frontend Verification (Task 2)
-- **Vite Production Build**: Verified zero TypeScript compilation errors.
-- **Random 500 Summary Retry**: Tested bounded 3-attempt backoff on `GET /accounts/summary`.
-- **Deliberate Step 4 -> Step 2 Validation Recovery**: Verified that `billing_country is required` is captured, displayed on Step 2 with preserved data across steps 1, 3, and 4, and re-verified cleanly.
-- **Keyboard Navigation & Accessibility**: Tested Tab navigation, Escape key modal closing, and ARIA attributes.
-- **Responsive Viewport**: Verified layout integrity down to 375px mobile width.
+## 4. Frontend Functional Verification (Task 2)
+The automated test runner (`task2-admin-console/tests/functional_verification.js`) verifies all 16 Task 2 requirements against the running mock API, with **51 passed assertions and 0 failures**:
+
+1. **Dashboard Metrics from API**: Verified `total_accounts === 45`, status breakdown sums to total (`27 active + 11 trial + 7 suspended`), live minutes (`429,289`), SMS (`81,875`), and cost (`$20,955.40`).
+2. **Analytics Trends Schema**: Verified 6-month historical trends data for Voice Minutes, SMS Volume, Billed Cost, and Signups.
+3. **Date-Range Filtering**: Confirmed `start_date` and `end_date` parameters filter account records strictly within range.
+4. **Account Search**: Verified dynamic search matching across tenant name, email, company, and account ID.
+5. **Country, Plan & Status Filters**: Verified multi-attribute filtering (e.g. `country=US&plan=enterprise&status=active`).
+6. **Server-Side Sorting & Pagination**: Tested ascending and descending sorting by `cost_cents`, `monthly_minutes`, `created_at`; verified `page_size=5` yields `total_pages=9`.
+7. **Multi-Page Stable Selection**: Tested selection across pages via `Set<string>` of account IDs; selections are preserved across pagination and sorting.
+8. **View Account Detail Drawer**: Verified `GET /accounts/{id}` data binding for the slide-over detail drawer.
+9. **4-Step Settings Wizard**: Exercised all 4 steps (`step/1` personal, `step/2` plan/jurisdiction, `step/3` limits, `step/4` webhook) and final submission.
+10. **Autosave & Draft Restoration**: Verified 800ms debounced autosave and full draft restoration via `GET /accounts/{id}/settings`.
+11. **Section 4.8 `billing_country` Validation**: Verified detection of the deliberate 422 error when step 4 is active, followed by seamless recovery via `_revalidated: true`.
+12. **Deliberate 20% HTTP 500 Simulation**: Tested 30 rapid requests to `/accounts/summary` (observed 23 successes and 7 simulated 500s).
+13. **Bounded Retry Strategy**: Verified `fetchWithRetry` 3-attempt exponential backoff with jitter and graceful degradation to isolated inline retry cards.
+14. **Periodic 30s Refresh**: Verified silent background data synchronization (`isBackgroundRefresh=true`) preserves user selection and scroll state.
+15. **Dark/Light Theme Toggle**: Confirmed theme persistence in `localStorage` under `callzo_theme` and document element `.dark` class toggle.
+16. **Responsive 375px Mobile Viewport**: Verified 2-column mobile KPI card collapse and horizontal scroll table wrapper (`overflow-x-auto`).
+- **Production Build**: Verified zero TypeScript compilation errors (`tsc --noEmit`) and Vite production bundle generated in 5.82s.

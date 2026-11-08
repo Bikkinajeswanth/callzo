@@ -98,7 +98,8 @@ python server.py
 
 # Terminal 2: Start Vite Dev Server
 npm run dev
-# App available at http://localhost:3000 (proxies /api -> http://localhost:8001)
+# App available at http://localhost:5173 (Vite dev server proxies /api -> http://127.0.0.1:8002)
+# (When running under Docker Compose, the Nginx container serves at http://localhost:3000)
 ```
 
 ### 3.2 Running with Docker Compose

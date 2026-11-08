@@ -165,7 +165,8 @@ cd mock-api && python server.py
 # Terminal 2: Start frontend Vite server
 npm install
 npm run dev
-# Open http://localhost:3000
+# Open http://localhost:5173 (Vite dev server proxies /api to mock API)
+# (When deployed via Docker Compose, frontend is served at http://localhost:3000)
 ```
 
 #### Publishing Pre-Built Image to Docker Hub (Section 6 Requirement)

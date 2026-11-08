@@ -137,7 +137,9 @@ async function runTests() {
   // TEST 9: Test all four steps of the account settings wizard
   // -------------------------------------------------------------------------
   console.log('\n[Test 9] All 4 Steps of Account Settings Wizard');
-  const targetAcc = 'acc_002'; // Use existing account in ACCOUNTS_DB
+  // Use a fresh account ID each run (acc_005 to acc_045)
+  const randNum = Math.floor(Math.random() * 40) + 5;
+  const targetAcc = `acc_${String(randNum).padStart(3, '0')}`;
 
   // Step 1: Personal
   const s1 = await fetch(`${API_BASE}/accounts/${targetAcc}/settings/step/1`, {

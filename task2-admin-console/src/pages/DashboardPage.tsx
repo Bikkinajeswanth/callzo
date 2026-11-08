@@ -6,7 +6,9 @@ import { AnalyticsCharts } from '../components/AnalyticsCharts';
 import { AccountFilterBar } from '../components/AccountFilterBar';
 import { AccountTable } from '../components/AccountTable';
 import { SettingsWizardModal } from '../components/SettingsWizardModal';
+import { AccountDetailDrawer } from '../components/AccountDetailDrawer';
 import { formatCents, formatNumber } from '../utils/formatters';
+import { Account } from '../types';
 
 interface DashboardPageProps {
   isRefreshing: boolean;
@@ -39,6 +41,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({}) => {
 
   // Settings Wizard Modal state
   const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
+  // Account Detail Drawer state
+  const [viewingAccountId, setViewingAccountId] = useState<string | null>(null);
 
   const handleFilterChange = (updated: any) => {
     setParams((prev) => ({ ...prev, ...updated }));
@@ -162,6 +166,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({}) => {
           onToggleSelectAll={toggleSelectAllCurrentPage}
           onToggleSelectOne={toggleSelectAccount}
           onOpenSettings={(id) => setEditingAccountId(id)}
+          onViewDetails={(id) => setViewingAccountId(id)}
         />
       </section>
 
@@ -176,6 +181,16 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({}) => {
           }}
         />
       )}
+
+      {/* Account Detail Side Drawer */}
+      <AccountDetailDrawer
+        accountId={viewingAccountId}
+        onClose={() => setViewingAccountId(null)}
+        onOpenSettings={(account: Account) => {
+          setViewingAccountId(null);
+          setEditingAccountId(account.id);
+        }}
+      />
     </main>
   );
 };

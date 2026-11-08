@@ -13,6 +13,7 @@ from app.api.v1.usage import router as usage_router
 from app.api.v1.caps import router as caps_router
 from app.api.v1.health import router as health_router
 from app.api.v1.reconciliation import router as reconciliation_router
+from app.api.v1.accounts import router as accounts_router
 
 # Initialize tables automatically for SQLite/Dev
 try:
@@ -79,6 +80,7 @@ app.include_router(health_router, prefix="/api/v1")
 app.include_router(usage_router, prefix="/api/v1")
 app.include_router(caps_router, prefix="/api/v1")
 app.include_router(reconciliation_router, prefix="/api/v1")
+app.include_router(accounts_router, prefix="/api/v1")
 
 
 @app.get("/")

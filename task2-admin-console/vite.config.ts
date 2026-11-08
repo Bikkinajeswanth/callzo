@@ -15,5 +15,18 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Isolate recharts (and its transitive deps) into its own chunk
+          recharts: ['recharts'],
+          // React core in its own chunk
+          'react-vendor': ['react', 'react-dom'],
+        }
+      }
+    }
   }
 });

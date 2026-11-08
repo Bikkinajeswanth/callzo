@@ -13,6 +13,7 @@ interface AccountTableProps {
   onToggleSelectAll: () => void;
   onToggleSelectOne: (id: string) => void;
   onOpenSettings: (accountId: string) => void;
+  onViewDetails?: (accountId: string) => void;
 }
 
 export const AccountTable: React.FC<AccountTableProps> = ({
@@ -26,6 +27,7 @@ export const AccountTable: React.FC<AccountTableProps> = ({
   onToggleSelectAll,
   onToggleSelectOne,
   onOpenSettings,
+  onViewDetails,
 }) => {
   const currentPageIds = accounts.map((a) => a.id);
   const isAllCurrentPageSelected =
@@ -279,13 +281,24 @@ export const AccountTable: React.FC<AccountTableProps> = ({
                     </td>
 
                     <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={() => onOpenSettings(acc.id)}
-                        className="px-2.5 py-1 text-xs font-semibold rounded bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:hover:bg-sky-900 text-sky-700 dark:text-sky-300 transition focus:outline-none focus:ring-2 focus:ring-sky-500"
-                        title="Configure 4-Step Account Settings"
-                      >
-                        Settings
-                      </button>
+                      <div className="flex items-center justify-center gap-1.5">
+                        {onViewDetails && (
+                          <button
+                            onClick={() => onViewDetails(acc.id)}
+                            className="px-2.5 py-1 text-xs font-semibold rounded bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition focus:outline-none focus:ring-2 focus:ring-slate-400"
+                            title="View account details"
+                          >
+                            View
+                          </button>
+                        )}
+                        <button
+                          onClick={() => onOpenSettings(acc.id)}
+                          className="px-2.5 py-1 text-xs font-semibold rounded bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:hover:bg-sky-900 text-sky-700 dark:text-sky-300 transition focus:outline-none focus:ring-2 focus:ring-sky-500"
+                          title="Configure 4-Step Account Settings"
+                        >
+                          Settings
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

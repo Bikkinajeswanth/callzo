@@ -49,7 +49,7 @@ callzo/
 │   │   └── main.py          # FastAPI application initialization & correlation middleware
 │   ├── alembic/             # Database migration configurations & version scripts
 │   ├── simulator/           # Telephony event simulator & scenario runner
-│   ├── tests/               # Pytest suite (17 comprehensive tests)
+│   ├── tests/               # Pytest suite (24 comprehensive tests)
 │   ├── Dockerfile           # Optimized Python 3.12 container
 │   ├── docker-compose.yml   # Standalone Task 1 container orchestration
 │   ├── requirements.txt     # Backend dependencies
@@ -147,7 +147,7 @@ python simulator/runner.py     # All scenarios
 ```bash
 python -m pytest task1-usage-metering/tests -v
 ```
-**Results**: 17 tests passed in 0.56s.
+**Results**: 24 tests passed in ~1.15s.
 
 ---
 
@@ -188,7 +188,7 @@ docker push $DOCKER_HUB_USERNAME/usage-admin-console:latest
 | **Task 1 Late Events** | ✅ Completed | Events with timestamps ~35 days in past attribute strictly to historical month; current month unaffected. |
 | **Task 1 Monthly Usage Caps** | ✅ Completed | Atomic evaluation using row-level locking (`SELECT ... FOR UPDATE`); soft and hard limit flags. |
 | **Task 1 Retries & Reconciliation** | ✅ Completed | Persistent backoff retry worker + reconciliation audit repair endpoint; tested in `test_reconciliation.py`. |
-| **Task 1 Automated Tests** | ✅ Completed | 17/17 automated tests passing in Pytest. |
+| **Task 1 Automated Tests** | ✅ Completed | 24/24 automated tests passing in Pytest (100% pass rate). |
 | **Task 1 Docker Compose** | ✅ Completed | PostgreSQL readiness wait + auto-Alembic migration + healthy API + simulator runner. |
 | **Task 2 Overview Dashboard** | ✅ Completed | KPI metric cards (tenants, minutes, SMS, costs) + Recharts time-series and breakdowns. |
 | **Task 2 Resilient Error Handling** | ✅ Completed | Bounded retry on deliberate 20% 500 error; inline error with manual retry; table remains fully operational. |

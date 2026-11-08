@@ -67,6 +67,10 @@ Normalized PostgreSQL schema featuring:
 | :--- | :--- | :--- | :--- |
 | `POST` | `/webhooks/calls` | `X-Signature` | Ingests telephony events from simulator |
 | `GET` | `/health` | None | Service readiness & DB connectivity check |
+| `POST` | `/api/v1/accounts` | `X-API-Key` | Create tenant account with provisioned usage cap |
+| `GET` | `/api/v1/accounts` | `X-API-Key` | List accounts with status and plan filters |
+| `GET` | `/api/v1/accounts/{id}` | `X-API-Key` | Get individual account details |
+| `PATCH` | `/api/v1/accounts/{id}` | `X-API-Key` | Partial account field update |
 | `GET` | `/api/v1/accounts/{id}/usage/overview` | `X-API-Key` | Current month + lifetime usage summary |
 | `GET` | `/api/v1/accounts/{id}/usage/monthly` | `X-API-Key` | Monthly breakdown by `year_month` |
 | `GET` | `/api/v1/accounts/{id}/calls` | `X-API-Key` | Paginated call history with filters |
@@ -109,3 +113,4 @@ python simulator/runner.py 7   # Malformed payloads
 ```bash
 pytest -v
 ```
+All 24 automated tests pass in ~1.15s covering signatures, idempotency, out-of-order, late events, monthly caps, reconciliation, retries, usage APIs, accounts CRUD, and webhook schema validation.

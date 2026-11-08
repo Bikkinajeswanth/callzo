@@ -23,7 +23,9 @@ task2-admin-console/
 │   │   ├── MetricCard.tsx             # Stat cards (tenants, minutes, SMS, costs)
 │   │   ├── AnalyticsCharts.tsx        # Recharts time-series & breakdown with retry
 │   │   ├── AccountFilterBar.tsx       # Search, status, country, plan, date range picker
-│   │   ├── AccountTable.tsx           # Paginated table with stable selection
+│   │   ├── AccountTable.tsx           # Paginated table with stable selection & CSV export
+│   │   ├── AccountDetailDrawer.tsx    # Slide-over tenant detail & usage KPI drawer
+│   │   ├── ErrorBoundary.tsx          # Top-level crash prevention with graceful reload UI
 │   │   ├── SettingsWizardModal.tsx    # 4-step configuration dialog with keyboard trap
 │   │   ├── FormStep1Personal.tsx      # Name & email step with validation
 │   │   ├── FormStep2Subscription.tsx  # Plan & billing country (handles Section 4.8)

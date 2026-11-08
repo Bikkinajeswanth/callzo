@@ -74,28 +74,59 @@ export const AccountTable: React.FC<AccountTableProps> = ({
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
       {/* Table Title and Summary Info */}
-      <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+      <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-            Customer Accounts Directory
-          </h2>
+          <div className="flex items-center space-x-2">
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+              Customer Accounts Directory
+            </h2>
+            {selectedIds.size > 0 && (
+              <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300">
+                {selectedIds.size} Selected
+              </span>
+            )}
+          </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Showing {accounts.length} of {totalRecords} accounts
           </p>
         </div>
 
-        {/* Page Size Selector */}
-        <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400">
-          <span>Rows per page:</span>
-          <select
-            value={params.page_size}
-            onChange={(e) => onParamChange({ page_size: Number(e.target.value), page: 1 })}
-            className="px-2 py-1 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-sky-500"
-          >
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-          </select>
+        {/* Bulk Actions & Page Size Selector */}
+        <div className="flex items-center space-x-3">
+          {selectedIds.size > 0 && (
+            <button
+              onClick={() => {
+                const selectedAccounts = accounts.filter(a => selectedIds.has(a.id));
+                const csvContent = "data:text/csv;charset=utf-8," 
+                  + ["ID,Name,Email,Company,Country,Plan,Status,Minutes,Cost"]
+                  .concat(selectedAccounts.map(a => `${a.id},"${a.name}","${a.email}","${a.company}",${a.country},${a.plan},${a.status},${a.monthly_minutes},${a.cost_cents/100}`))
+                  .join("\n");
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `callzo_selected_tenants_${new Date().toISOString().substring(0,10)}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+              className="px-2.5 py-1 text-xs font-semibold rounded bg-sky-600 hover:bg-sky-700 text-white shadow-sm transition flex items-center space-x-1"
+            >
+              <span>Export CSV</span>
+            </button>
+          )}
+
+          <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400">
+            <span>Rows:</span>
+            <select
+              value={params.page_size}
+              onChange={(e) => onParamChange({ page_size: Number(e.target.value), page: 1 })}
+              className="px-2 py-1 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            >
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </div>
         </div>
       </div>
 

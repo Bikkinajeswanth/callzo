@@ -30,7 +30,7 @@ export function useSettingsDraft(accountId: string | null) {
   const [generalError, setGeneralError] = useState<string | null>(null);
 
   // Debounce timers per step
-  const debounceTimers = useRef<Record<number, NodeJS.Timeout | null>>({
+  const debounceTimers = useRef<Record<number, ReturnType<typeof setTimeout> | null>>({
     1: null,
     2: null,
     3: null,

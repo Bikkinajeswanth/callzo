@@ -59,6 +59,21 @@ Normalized PostgreSQL schema featuring:
 - Exponential backoff schedule: $\text{delay} = \text{base} \times 2^{(\text{attempts}-1)}$.
 - Bounded to a maximum of 5 attempts before marking status as `exhausted`.
 
+### 2.9 Architectural Trade-offs
+- **Synchronous Webhook Rollup vs. Async Queue (Kafka/RabbitMQ)**:
+  - *Decision*: Rolled up directly within a PostgreSQL transaction using row-level locking (`with_for_update()`).
+  - *Trade-off*: Slightly higher latency per webhook (15-30ms) in exchange for absolute immediate consistency, zero queue lag, and guaranteed ACID idempotency without managing a distributed broker.
+- **Integer Cents vs. Floating-Point Decimals**:
+  - *Decision*: All monetary values (`cost_cents`, `total_cost_cents`) are stored as 64-bit integers.
+  - *Trade-off*: Requires client formatting (`$4.80` from `480`), but permanently eliminates IEEE 754 floating-point rounding errors in financial billing.
+- **Pre-Aggregated Monthly Rollups vs. Dynamic Group By**:
+  - *Decision*: Maintained in `monthly_usage` keyed by `(account_id, year_month)`.
+  - *Trade-off*: Requires incremental updates and periodic reconciliation, but provides $O(1)$ constant-time query latency for customer dashboards regardless of total call volume.
+
+### 2.10 State Management & Ingestion Guarantees
+- **At-Least-Once Delivery Resilience**: Telephony carriers frequently retransmit webhooks. Handled via the unique database constraint on `raw_webhook_events(event_id)`, making repeated deliveries idempotent.
+- **Event Replayability**: Raw body bytes and signatures are stored in `raw_webhook_events`, allowing complete recomputation or auditing from scratch.
+
 ---
 
 ## 3. API Endpoints
@@ -114,3 +129,11 @@ python simulator/runner.py 7   # Malformed payloads
 pytest -v
 ```
 All 24 automated tests pass in ~1.15s covering signatures, idempotency, out-of-order, late events, monthly caps, reconciliation, retries, usage APIs, accounts CRUD, and webhook schema validation.
+
+---
+
+## 5. Future Improvements & Scaling Roadmap
+1. **Distributed Stream Ingestion**: At 100,000+ events/sec, introduce Apache Kafka or AWS Kinesis upstream of the database, partitioning by `account_id` to serialize per-tenant state without row-lock contention.
+2. **Read/Write Replica Splitting**: Route analytical and dashboard read queries (`GET /api/v1/accounts/*/usage`) to PostgreSQL read replicas with connection pooling via PgBouncer.
+3. **Dead-Letter Queue (DLQ) Visualizer**: Build an administrative interface to inspect, edit, and manually replay `exhausted` retry records from `event_retry_records`.
+4. **Partitioned Historical Tables**: Use PostgreSQL declarative table partitioning by `year_month` on `calls` and `raw_webhook_events` to optimize vacuuming and long-term storage archival.

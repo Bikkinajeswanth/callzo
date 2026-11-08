@@ -126,3 +126,11 @@ docker login
 docker push $DOCKER_HUB_USERNAME/usage-admin-console:latest
 ```
 Evaluators can then run `docker compose up` directly using the published image.
+
+---
+
+## 4. Future Improvements & Enhancements
+1. **WebSocket / SSE Live Streaming**: Replace 30-second polling with Server-Sent Events (SSE) or WebSockets for real-time call ticker and live cost graphs.
+2. **Multi-Column Sorting**: Support multi-attribute sorting (e.g. status ascending then cost descending).
+3. **Batch Operations**: Add bulk status updates (e.g. suspend multiple delinquent accounts simultaneously).
+4. **Internationalization (i18n)**: Support multi-currency rendering (EUR, GBP, INR) based on tenant billing jurisdiction.

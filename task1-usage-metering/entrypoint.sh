@@ -9,8 +9,14 @@ if echo "$DATABASE_URL" | grep -q "postgres"; then
     until python -c "
 import sys, os, psycopg2
 try:
-    url = os.getenv('DATABASE_URL_SYNC') or os.getenv('DATABASE_URL')
-    psycopg2.connect(url)
+    raw_url = os.getenv('DATABASE_URL_SYNC') or os.getenv('DATABASE_URL')
+    if '://' in raw_url:
+        _, rest = raw_url.split('://', 1)
+        dsn = 'postgresql://' + rest
+    else:
+        dsn = raw_url
+    conn = psycopg2.connect(dsn, connect_timeout=3)
+    conn.close()
     sys.exit(0)
 except Exception as e:
     sys.exit(1)
@@ -23,6 +29,10 @@ except Exception as e:
     echo "Running database schema migrations via Alembic..."
     alembic upgrade head
     echo "Migrations applied successfully."
+fi
+
+if [ $# -gt 0 ]; then
+    exec "$@"
 fi
 
 echo "Launching Uvicorn server on ${HOST:-0.0.0.0}:${PORT:-8000}..."

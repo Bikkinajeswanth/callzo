@@ -38,7 +38,7 @@ services:
       HOST: 0.0.0.0
       PORT: 8000
     ports:
-      - "8000:8000"
+      - "8003:8000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
@@ -59,6 +59,7 @@ services:
     environment:
       WEBHOOK_URL: http://metering-api:8000/webhooks/calls
       WEBHOOK_SECRET: callzo_test_secret_change_me
+      API_KEY: callzo_internal_api_key_secure_123
     entrypoint: ["python", "simulator/runner.py"]
     networks:
       - callzo-net

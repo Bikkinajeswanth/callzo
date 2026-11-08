@@ -99,15 +99,15 @@ python server.py
 # Terminal 2: Start Vite Dev Server
 npm run dev
 # App available at http://localhost:5173 (Vite dev server proxies /api -> http://127.0.0.1:8002)
-# (When running under Docker Compose, the Nginx container serves at http://localhost:3000)
+# (When running under Docker Compose, the Nginx container serves at http://localhost:3002)
 ```
 
 ### 3.2 Running with Docker Compose
 ```bash
 docker compose up --build
 ```
-- Frontend runs at `http://localhost:3000`
-- Mock API runs at `http://localhost:8001`
+- Frontend runs at `http://localhost:3002`
+- Mock API published on host at `http://localhost:8002` (container internal port `8001`)
 - Frontend nginx container proxies `/api/` directly to `http://mock-api:8001/` internally.
 
 ### 3.3 Publishing Pre-Built Image to Docker Hub

@@ -9,7 +9,7 @@ flowchart TD
         Browser["React Admin Console<br/>(Tailwind, Recharts, Vite)"]
     end
 
-    subgraph Task1_Backend ["Task 1: Usage Metering Backend (Port 8000)"]
+    subgraph Task1_Backend ["Task 1: Usage Metering Backend (Host 8003, Container 8000)"]
         Ingress["FastAPI Webhook Receiver<br/>POST /webhooks/calls"]
         HMAC["HMAC-SHA256 Verifier<br/>(Raw Body Bytes)"]
         Idem["Idempotency Filter<br/>(DB Unique Constraint)"]
@@ -19,7 +19,7 @@ flowchart TD
         Worker["Background Retry Worker<br/>(Exponential Backoff)"]
     end
 
-    subgraph Task2_Backend ["Task 2: Mock Admin API (Port 8001)"]
+    subgraph Task2_Backend ["Task 2: Mock Admin API (Host 8002, Container 8001)"]
         MockAPI["Mock Telephony API<br/>(20% Deliberate 500, Step 2 Validation)"]
     end
 

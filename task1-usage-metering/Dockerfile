@@ -14,18 +14,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Create non-root user and group explicitly
+RUN groupadd -g 1000 appuser && \
+    useradd -u 1000 -g appuser -m -d /home/appuser -s /bin/sh appuser
+
 # Copy dependency specifications and install
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application source code
-COPY . .
+COPY --chown=appuser:appuser . .
 
-# Ensure entrypoint script is executable
-RUN chmod +x entrypoint.sh
+# Ensure entrypoint script is executable and /app is owned by appuser
+RUN chmod +x entrypoint.sh && chown -R appuser:appuser /app
 
-# Create non-root user for security
-RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
 EXPOSE 8000

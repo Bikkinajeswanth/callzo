@@ -15,6 +15,7 @@ import httpx
 
 WEBHOOK_URL = os.getenv("WEBHOOK_URL", "http://localhost:8000/webhooks/calls")
 SECRET = os.getenv("WEBHOOK_SECRET", "callzo_test_secret_change_me")
+API_KEY = os.getenv("API_KEY", "callzo_internal_api_key_secure_123")
 
 
 def sign(payload_bytes: bytes, secret: str = SECRET) -> str:
@@ -164,6 +165,29 @@ def run_scenario_5_cap_breach():
     print("\n--- Running Scenario 5: Monthly Cap Breach ---")
     account_id = "acc_capped_user"
     call_id = f"call_cap_{uuid.uuid4().hex[:8]}"
+
+    # Provision hard usage cap for acc_capped_user before sending event
+    api_base = os.getenv("API_BASE_URL") or WEBHOOK_URL.split("/webhooks/calls")[0]
+    cap_url = f"{api_base}/api/v1/accounts/{account_id}/cap"
+    cap_payload = {
+        "monthly_minutes_cap": 100,
+        "monthly_cost_cents_cap": 5000,
+        "is_hard_cap": True
+    }
+    cap_headers = {
+        "Content-Type": "application/json",
+        "X-API-Key": API_KEY
+    }
+
+    try:
+        cap_resp = httpx.put(cap_url, json=cap_payload, headers=cap_headers, timeout=10.0)
+        print(f"  Cap provisioning: HTTP {cap_resp.status_code} -> {cap_resp.text}")
+        if cap_resp.status_code != 200:
+            print(f"  [ERROR] Cap provisioning failed with status {cap_resp.status_code}. Aborting Scenario 5.")
+            return
+    except Exception as e:
+        print(f"  [ERROR] Cap provisioning connection failure to {cap_url}: {e}. Aborting Scenario 5.")
+        return
 
     payload = {
         "event_id": f"evt_cap_{uuid.uuid4().hex[:8]}",

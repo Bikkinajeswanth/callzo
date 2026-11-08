@@ -41,7 +41,7 @@ services:
       HOST: 0.0.0.0
       PORT: 8000
     ports:
-      - "8000:8000"
+      - "8003:8000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
@@ -62,6 +62,7 @@ services:
     environment:
       WEBHOOK_URL: http://metering-api:8000/webhooks/calls
       WEBHOOK_SECRET: callzo_test_secret_change_me
+      API_KEY: callzo_internal_api_key_secure_123
     entrypoint: ["python", "simulator/runner.py"]
     networks:
       - callzo-network
@@ -79,7 +80,7 @@ services:
     environment:
       PORT: "8001"
     ports:
-      - "8001:8001"
+      - "8002:8001"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health')\""]
       interval: 5s
@@ -99,9 +100,14 @@ services:
       mock-api:
         condition: service_healthy
     ports:
-      - "3000:80"
+      - "3002:80"
     environment:
       - VITE_API_URL=/api
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:80/ || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
     networks:
       - callzo-network
 

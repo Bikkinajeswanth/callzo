@@ -33,9 +33,10 @@ class Settings(BaseSettings):
 
     @property
     def sync_database_url(self) -> str:
-        if self.DATABASE_URL_SYNC:
-            return self.DATABASE_URL_SYNC
-        return self.DATABASE_URL
+        url = self.DATABASE_URL_SYNC or self.DATABASE_URL
+        if url.startswith("postgresql://"):
+            return url.replace("postgresql://", "postgresql+psycopg2://", 1)
+        return url
 
 
 settings = Settings()

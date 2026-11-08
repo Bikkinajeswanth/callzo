@@ -6,8 +6,8 @@ import {
   SettingsDraft,
 } from '../types';
 
-// Supports environment override, falling back to Vite development proxy (/api) or direct localhost:8001
-const API_BASE = (import.meta.env.VITE_API_URL as string) || (typeof window !== 'undefined' ? '/api' : 'http://localhost:8001');
+// Supports environment override, falling back to Vite development proxy (/api) or direct localhost:8002
+const API_BASE = (import.meta.env.VITE_API_URL as string) || (typeof window !== 'undefined' ? '/api' : 'http://localhost:8002');
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE}${endpoint}`;

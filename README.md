@@ -167,16 +167,16 @@ docker compose up --build
 
 This automatically boots:
 - `callzo-postgres`: PostgreSQL 16 on port `5432`
-- `callzo-metering-api`: Usage Metering FastAPI on port `8000` (auto-runs migrations)
+- `callzo-metering-api`: Usage Metering FastAPI on host port `8003` (container port `8000`, auto-runs migrations)
 - `callzo-simulator`: Fires all 7 telephony test scenarios against the metering API
-- `callzo-mock-api`: Mock Telephony Admin API on port `8001`
-- `callzo-admin-console`: React Frontend Console on port `3000`
+- `callzo-mock-api`: Mock Telephony Admin API on host port `8002` (container port `8001`)
+- `callzo-admin-console`: React Frontend Console on host port `3002` (container port `80`)
 
 #### Access Application Endpoints:
-- **Admin Console Dashboard**: [http://localhost:3000](http://localhost:3000)
-- **Metering API Swagger Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
-- **Metering API Health Endpoint**: [http://localhost:8000/health](http://localhost:8000/health)
-- **Mock Admin API**: [http://localhost:8001/accounts](http://localhost:8001/accounts)
+- **Admin Console Dashboard**: [http://localhost:3002](http://localhost:3002)
+- **Metering API Swagger Docs**: [http://localhost:8003/docs](http://localhost:8003/docs)
+- **Metering API Health Endpoint**: [http://localhost:8003/health](http://localhost:8003/health)
+- **Mock Admin API**: [http://localhost:8002/accounts](http://localhost:8002/accounts)
 
 ---
 
@@ -260,7 +260,7 @@ npm run build
 
 ## 8. API Documentation
 
-### Task 1: Metering API Endpoints (`http://localhost:8000`)
+### Task 1: Metering API Endpoints (`http://localhost:8003` on host, `http://metering-api:8000` in Docker network)
 | Method | Path | Auth | Description |
 | :--- | :--- | :---: | :--- |
 | `POST` | `/webhooks/calls` | `X-Signature` | Ingests telephony events (`call.started`, `call.ended`, `call.failed`). |
@@ -275,7 +275,7 @@ npm run build
 | `POST` | `/caps/{account_id}` | `X-API-Key` | Configures soft and hard limits for an account. |
 | `POST` | `/reconciliation/reconcile` | `X-API-Key` | Triggers self-healing audit reconciling aggregated usage. |
 
-### Task 2: Mock Admin API Endpoints (`http://localhost:8001` or `8002`)
+### Task 2: Mock Admin API Endpoints (`http://localhost:8002` on host, `http://mock-api:8001` in Docker network)
 | Method | Path | Description |
 | :--- | :--- | :--- |
 | `GET` | `/health` | Mock API health check. |

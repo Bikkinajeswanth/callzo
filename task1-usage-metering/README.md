@@ -106,7 +106,7 @@ This automatically:
 1. Provisions PostgreSQL 16 with persistent volume `pgdata`.
 2. Waits for PostgreSQL readiness.
 3. Applies Alembic migrations (`alembic upgrade head`).
-4. Starts FastAPI on port `8000`.
+4. Starts FastAPI on host port `8003` (container internal port `8000`).
 5. Starts the Telephony Simulator container which fires all scenarios against the API.
 
 ### 4.2 Running Simulator Scenarios Individually

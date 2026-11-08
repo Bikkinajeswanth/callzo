@@ -1,0 +1,72 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: callzo-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: callzo_user
+      POSTGRES_PASSWORD: callzo_password
+      POSTGRES_DB: callzo_metering
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U callzo_user -d callzo_metering"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - callzo-net
+
+  metering-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: callzo-metering-api
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ENVIRONMENT: production
+      LOG_LEVEL: INFO
+      DATABASE_URL: postgresql://callzo_user:callzo_password@postgres:5432/callzo_metering
+      DATABASE_URL_SYNC: postgresql://callzo_user:callzo_password@postgres:5432/callzo_metering
+      WEBHOOK_SECRET: callzo_test_secret_change_me
+      API_KEY: callzo_internal_api_key_secure_123
+      HOST: 0.0.0.0
+      PORT: 8000
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - callzo-net
+
+  simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: callzo-simulator
+    restart: "no"
+    depends_on:
+      metering-api:
+        condition: service_healthy
+    environment:
+      WEBHOOK_URL: http://metering-api:8000/webhooks/calls
+      WEBHOOK_SECRET: callzo_test_secret_change_me
+    entrypoint: ["python", "simulator/runner.py"]
+    networks:
+      - callzo-net
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  callzo-net:
+    driver: bridge

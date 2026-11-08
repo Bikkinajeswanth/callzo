@@ -1,0 +1,112 @@
+services:
+  # ============================================================================
+  # TASK 1: USAGE METERING BACKEND & TELEPHONY SIMULATOR
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: callzo-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: callzo_user
+      POSTGRES_PASSWORD: callzo_password
+      POSTGRES_DB: callzo_metering
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U callzo_user -d callzo_metering"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - callzo-network
+
+  metering-api:
+    build:
+      context: ./task1-usage-metering
+      dockerfile: Dockerfile
+    container_name: callzo-metering-api
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ENVIRONMENT: production
+      LOG_LEVEL: INFO
+      DATABASE_URL: postgresql://callzo_user:callzo_password@postgres:5432/callzo_metering
+      DATABASE_URL_SYNC: postgresql://callzo_user:callzo_password@postgres:5432/callzo_metering
+      WEBHOOK_SECRET: callzo_test_secret_change_me
+      API_KEY: callzo_internal_api_key_secure_123
+      HOST: 0.0.0.0
+      PORT: 8000
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - callzo-network
+
+  simulator:
+    build:
+      context: ./task1-usage-metering
+      dockerfile: Dockerfile
+    container_name: callzo-simulator
+    restart: "no"
+    depends_on:
+      metering-api:
+        condition: service_healthy
+    environment:
+      WEBHOOK_URL: http://metering-api:8000/webhooks/calls
+      WEBHOOK_SECRET: callzo_test_secret_change_me
+    entrypoint: ["python", "simulator/runner.py"]
+    networks:
+      - callzo-network
+
+  # ============================================================================
+  # TASK 2: USAGE ADMIN CONSOLE & MOCK API
+  # ============================================================================
+  mock-api:
+    build:
+      context: ./task2-admin-console/mock-api
+      dockerfile: Dockerfile
+    image: ${DOCKER_HUB_USERNAME:-callzo}/mock-api:latest
+    container_name: callzo-mock-api
+    restart: always
+    ports:
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health')\""]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - callzo-network
+
+  frontend:
+    build:
+      context: ./task2-admin-console
+      dockerfile: Dockerfile
+    image: ${DOCKER_HUB_USERNAME:-callzo}/usage-admin-console:latest
+    container_name: callzo-admin-console
+    restart: always
+    depends_on:
+      mock-api:
+        condition: service_healthy
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=/api
+    networks:
+      - callzo-network
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  callzo-network:
+    driver: bridge

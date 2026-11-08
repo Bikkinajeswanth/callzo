@@ -2,8 +2,8 @@
 
 ## 1. Executive Summary
 - **Test Framework**: Pytest 8.2.2 with asyncio & FastAPI TestClient
-- **Test Results**: 17 Passed, 0 Failed, 0 Skipped (100% Pass Rate)
-- **Execution Time**: 0.56 seconds
+- **Test Results**: 24 Passed, 0 Failed, 0 Skipped (100% Pass Rate)
+- **Execution Time**: ~1.15 seconds
 - **Database Engine Tested**: In-memory SQLite (isolated transaction rollbacks) & PostgreSQL 16 (via Docker Compose)
 
 ---
@@ -29,6 +29,13 @@
 | `test_usage_api.py` | `test_health_endpoint` | Section 3.10 Health, DB readiness, uptime, and metrics | **PASSED** | 0.02s |
 | `test_usage_api.py` | `test_authenticated_usage_apis` | Section 3.8 Authentication (X-API-Key/Bearer) & overview query | **PASSED** | 0.04s |
 | `test_usage_api.py` | `test_calls_pagination_and_filter` | Section 3.8 Server-side pagination and call filtering | **PASSED** | 0.03s |
+| `test_accounts_api.py` | `test_create_account` | Section 3.8 Explicit account creation with auto-provisioned cap | **PASSED** | 0.04s |
+| `test_accounts_api.py` | `test_create_account_duplicate_returns_409` | Section 3.8 Conflict detection for duplicate account ID | **PASSED** | 0.02s |
+| `test_accounts_api.py` | `test_list_accounts` | Section 3.8 Paginated account listing with status/plan filters | **PASSED** | 0.03s |
+| `test_accounts_api.py` | `test_get_account_by_id` | Section 3.8 Single account retrieval | **PASSED** | 0.02s |
+| `test_accounts_api.py` | `test_get_account_not_found` | Section 3.8 HTTP 404 for unknown account ID | **PASSED** | 0.02s |
+| `test_accounts_api.py` | `test_update_account` | Section 3.8 Partial PATCH update for account fields | **PASSED** | 0.03s |
+| `test_accounts_api.py` | `test_accounts_require_auth` | Section 3.8 Accounts API enforces X-API-Key authentication | **PASSED** | 0.02s |
 
 ---
 
